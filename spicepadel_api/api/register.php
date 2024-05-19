@@ -29,8 +29,9 @@
         } else { // si no , se hace el insert
             $q = "INSERT INTO user VALUES ('$dni', '$name', '$surename1', '$surename2', '$phone', '$email', '$address', '$password')";
             mysqli_query($conn, $q);
+            $token = bin2hex(random_bytes(16)); // para logear al usuario
             header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Dado de alta correctamente']);
+            echo json_encode(['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token]);
         }
     }
 ?>
