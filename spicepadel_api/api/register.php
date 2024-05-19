@@ -1,4 +1,6 @@
 <?php
+   
+
     // Permetre solicituds creuades
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
@@ -8,6 +10,8 @@
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
+
+     
 
         $dni = $data['dni'];
         $name = $data['name'];
@@ -21,6 +25,8 @@
         // comprovar que el dni no exista ya en la bd
         $q = "SELECT EXISTS (SELECT 1 from user WHERE dni = '$dni')";
         $result = mysqli_query($conn, $q);
+
+
         $arr_result = mysqli_fetch_array($result);
 
         if ($arr_result[0] == 1){ // Si ya existe un dni asi en la bd
@@ -31,7 +37,9 @@
             mysqli_query($conn, $q);
             $token = bin2hex(random_bytes(16)); // para logear al usuario
             header('Content-Type: application/json');
-            echo json_encode(['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token]);
+            $response = ['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token, 'user_mail' => $email];
+            echo json_encode($response);
         }
     }
+    $conn->close();
 ?>
