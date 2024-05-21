@@ -52,7 +52,7 @@ try {
                 $stmt->close();
 
                 // Insertar en la tabla member
-                $stmt = $conn->prepare("INSERT INTO member (dni, birthday, bank_account) VALUES (?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO member (dni_m, birthday, bank_account) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $dni, $birthday, $bank_account);
                 
                 if (!$stmt->execute()) {
