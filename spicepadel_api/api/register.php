@@ -1,21 +1,19 @@
 <?php
-// Permitir solicitudes cruzadas
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+   
 
-require_once "../includes/db_connection.php";
+    // Permetre solicituds creuades
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
-$response = ['success' => false, 'message' => 'Unknown error'];
+    require_once"../includes/db_connection.php";
 
-try {
+
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
-
-        if (!isset($data['dni'], $data['name'], $data['surename1'], $data['surename2'], $data['phone'], $data['email'], $data['birthday'], $data['bank_account'], $data['address'], $data['password'])) {
-            $response['message'] = 'Todos los campos son requeridos';
-            throw new Exception($response['message']);
-        }
+     
+        // echo json_encode(['success' => false, 'message' => json_encode($data)]);
 
         $dni = $data['dni'];
         $name = $data['name'];
@@ -28,39 +26,30 @@ try {
         $address = $data['address'];
         $password = $data['password'];
 
-        // Comprobar que el DNI no exista ya en la BD usando consultas preparadas para prevenir inyecciones SQL
-        $stmt = $conn->prepare("SELECT EXISTS (SELECT 1 FROM user WHERE dni = ?)");
-        $stmt->bind_param("s", $dni);
-        $stmt->execute();
-        $stmt->bind_result($exists);
-        $stmt->fetch();
-        $stmt->close();
+        // comprovar que el dni no exista ya en la bd
+        $q = "SELECT EXISTS (SELECT 1 from user WHERE dni = '$dni')";
+        $result = mysqli_query($conn, $q);
 
-        if ($exists) {
-            $response['message'] = 'El usuario ya existe';
-        } else {
-            // Insertar en la tabla user
-            $stmt = $conn->prepare("INSERT INTO user (dni, name, surname1, surname2, phone, email, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssss", $dni, $name, $surename1, $surename2, $phone, $email, $address, $password);
-            
-            if ($stmt->execute()) {
-                // Generar el token
-                $token = bin2hex(random_bytes(16));
-                $response = ['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token, 'user_mail' => $email];
-            } else {
-                // Capturar el error de la consulta
-                $response['message'] = 'Error en la ejecución de la consulta: ' . $stmt->error;
-            }
-            $stmt->close();
+
+        $arr_result = mysqli_fetch_array($result);
+
+        if ($arr_result[0] == 1){ // Si ya existe un dni asi en la bd
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'El usuario ya existe']);
+        } else { // si no , se hace el insert
+            // en la tabla user
+            $q = "INSERT INTO user VALUES ('$dni', '$name', '$surename1', '$surename2', '$phone', '$email', '$address', '$password')";
+            mysqli_query($conn, $q);
+            // // en la tabla member
+            // $q = "INSERT INTO member VALUES ('$dni', '$birthday','$bank_account')";
+            // mysqli_query($conn, $q);
+            // generar el token
+            $token = bin2hex(random_bytes(16)); // para logear al usuario
+            header('Content-Type: application/json');
+            $response = ['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token, 'user_mail' => $email];
+            echo json_encode($response);
+
         }
-    } else {
-        $response['message'] = 'Método no permitido';
     }
-} catch (Exception $e) {
-    $response['message'] = $e->getMessage();
-}
-
-header('Content-Type: application/json');
-echo json_encode($response);
-$conn->close();
+    $conn->close();
 ?>
