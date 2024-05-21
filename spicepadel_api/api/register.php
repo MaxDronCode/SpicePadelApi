@@ -19,6 +19,8 @@
         $surename2 = $data['surename2'];
         $phone = $data['phone'];
         $email = $data['email'];
+        $birthday = $data['birthday'];
+        $bank_account = $data['bank_account'];
         $address = $data['address'];
         $password = $data['password'];
 
@@ -33,8 +35,12 @@
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'El usuario ya existe']);
         } else { // si no , se hace el insert
+            // en la tabla user
             $q = "INSERT INTO user VALUES ('$dni', '$name', '$surename1', '$surename2', '$phone', '$email', '$address', '$password')";
             mysqli_query($conn, $q);
+            // en la tabla member
+            $q = "INSERT INTO member VALUES ('$dni', '$birthday','$bank_account')";
+            // generar el token
             $token = bin2hex(random_bytes(16)); // para logear al usuario
             header('Content-Type: application/json');
             $response = ['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token, 'user_mail' => $email];
