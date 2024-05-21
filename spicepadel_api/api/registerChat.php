@@ -39,19 +39,38 @@ try {
         if ($exists) {
             $response['message'] = 'El usuario ya existe';
         } else {
-            // Insertar en la tabla user
-            $stmt = $conn->prepare("INSERT INTO user (dni, name, surname1, surname2, phone, email, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssssss", $dni, $name, $surename1, $surename2, $phone, $email, $address, $password);
-            
-            if ($stmt->execute()) {
+            // Iniciar una transacción
+            $conn->begin_transaction();
+            try {
+                // Insertar en la tabla user
+                $stmt = $conn->prepare("INSERT INTO user (dni, name, surname1, surname2, phone, email, address, password) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssssss", $dni, $name, $surename1, $surename2, $phone, $email, $address, $password);
+                
+                if (!$stmt->execute()) {
+                    throw new Exception("Error en la ejecución de la consulta: " . $stmt->error);
+                }
+                $stmt->close();
+
+                // Insertar en la tabla member
+                $stmt = $conn->prepare("INSERT INTO member (dni, birthday, bank_account) VALUES (?, ?, ?)");
+                $stmt->bind_param("sss", $dni, $birthday, $bank_account);
+                
+                if (!$stmt->execute()) {
+                    throw new Exception("Error en la ejecución de la consulta: " . $stmt->error);
+                }
+                $stmt->close();
+
+                // Si todo va bien, confirmar la transacción
+                $conn->commit();
+
                 // Generar el token
                 $token = bin2hex(random_bytes(16));
                 $response = ['success' => true, 'message' => 'Dado de alta correctamente', 'token' => $token, 'user_mail' => $email];
-            } else {
-                // Capturar el error de la consulta
-                $response['message'] = 'Error en la ejecución de la consulta: ' . $stmt->error;
+            } catch (Exception $e) {
+                // Si ocurre un error, deshacer la transacción
+                $conn->rollback();
+                $response['message'] = $e->getMessage();
             }
-            $stmt->close();
         }
     } else {
         $response['message'] = 'Método no permitido';
