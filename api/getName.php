@@ -12,15 +12,12 @@
 
         $user_email = $data['user_email'];
 
-        $q= "SELECT CONCAT(name, ' ', surname1) AS player1_name FROM user WHERE email='$user_email'";
+        $q= "SELECT CONCAT(name, ' ', surname1) AS player1_name, dni, bithday from user join member on dni = dni_m and email='$user_email'";
         $result = mysqli_query($conn, $q);
         $arr_result = mysqli_fetch_assoc($result);
-        if ($arr_result) {
-            $user_name = $arr_result['player1_name'];
-            $response = ['user_name' => $user_name];
-        }
-       header('Content-Type: application/json');
-        echo json_encode($response);
+        $output = ['user_name' => $arr_result['player1_name'], 'dni' => $arr_result['dni'], 'birthday' => $arr_result['birthday']];
+        header('Content-Type: application/json');
+        echo json_encode($output);
         
     }
 ?>
