@@ -12,7 +12,7 @@
 
         $user_email = $data['user_email'];
 
-        $q= "SELECT CONCAT(name, ' ', surname1) AS player1_name, dni, bithday from user join member on dni = dni_m and email='$user_email'";
+        $q= "SELECT CONCAT(name, ' ', surname1) AS player1_name, dni, birthday from user join member on dni = dni_m where email='$user_email'";
         $result = mysqli_query($conn, $q);
         $arr_result = mysqli_fetch_assoc($result);
         $output = ['user_name' => $arr_result['player1_name'], 'dni' => $arr_result['dni'], 'birthday' => $arr_result['birthday']];
