@@ -10,16 +10,7 @@
 
      
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-        $q = "SELECT t.id, 
-            t.player1_dni, 
-            t.player2_dni, 
-            CONCAT(u1.name, ' ', u1.surname1) AS player1_name, 
-            CONCAT(u2.name, ' ', u2.surname1) AS player2_name
-            FROM team t
-            JOIN user u1 ON t.player1_dni = u1.dni
-            JOIN user u2 ON t.player2_dni = u2.dni
-            WHERE u1.dni <> u2.dni;
-            ";
+        $q = "SELECT * FROM `match` WHERE sets_t1 = 0 AND sets_t2 = 0";
         $result = mysqli_query($conn, $q);
         $data = array();
         while ($row = mysqli_fetch_assoc($result)) {
