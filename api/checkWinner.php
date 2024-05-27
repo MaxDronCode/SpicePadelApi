@@ -27,10 +27,14 @@
                 header('Content-Type: application/json');
                 echo json_encode(['success' => true, 'winner_id' => $team1_id]);
 
-            } else {
+            } elseif($arr_result['sets_t1'] < $arr_result['sets_t2']) {
 
                 header('Content-Type: application/json');
                 echo json_encode(['success' => true, 'winner_id' => $team2_id]);
+            } else {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => false, 'message' => 'Este match aun no esta puntuado!', 'tie' => true]);
+
             }
 
         } else {
