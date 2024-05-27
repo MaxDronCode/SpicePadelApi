@@ -20,7 +20,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     
         $user_dni=$arr_result['dni'];
     
-        $q="SELECT id, player2_dni, points from team where player1_dni = '$user_dni'";
+        $q="SELECT id, player2_dni from team where player1_dni = '$user_dni'";
         $result = mysqli_query($conn, $q);
         $arr_result=mysqli_fetch_array($result, true);
 
@@ -30,10 +30,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 
     }else{
 
-
-
     }
-
 
 }
 
