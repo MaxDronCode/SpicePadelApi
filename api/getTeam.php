@@ -13,7 +13,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 
     $q="SELECT dni from user where email = '$user_mail'";
     $result = mysqli_query($conn, $q);
-    
+
     if(mysqli_num_rows($result)>0){
         
         $arr_result=mysqli_fetch_array($result, true);
