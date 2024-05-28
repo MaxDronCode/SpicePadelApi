@@ -6,7 +6,7 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 require_once "../includes/db_connection.php";
 
-$sql = "SELECT id, name, description FROM field WHERE status = 'Available'";
+$sql = "SELECT id, name, description, field_img FROM field WHERE status = 'Available'";
 $result = $conn->query($sql);
 
 $fields = [];
