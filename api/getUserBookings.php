@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $user_mail = $data['user_mail'] ?? '';
 
     // Usar consultas preparadas para prevenir inyección SQL
-    $qMaxid = "SELECT MAX(id) as max_id FROM booking";
+    $qMaxid = "SELECT MAX(id) as max_id FROM booking WHERE member_id='$user_mail'";
     $stmtMaxid = $conn->prepare($qMaxid);
     $stmtMaxid->execute();
     $resultMaxid = $stmtMaxid->get_result();
