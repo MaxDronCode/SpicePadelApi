@@ -21,6 +21,13 @@ if (!$date || !$start_hour || !$end_hour || !$member_id || !$field_id) {
 $start_hour_time = strtotime($start_hour);
 $cutoff_time = strtotime('17:01');
 
+$current_date = date('Y-m-d');
+if ($date < $current_date) {
+    echo json_encode(['success' => false, 'message' => 'No se puede reservar una fecha anterior al día de hoy']);
+    exit;
+}
+
+
 if ($start_hour_time >= $cutoff_time) {
     echo json_encode(['success' => false, 'message' => 'No se puede reservar a partir de las 17:01']);
     exit; // Asegúrate de parar la ejecución si se cumple la condición
