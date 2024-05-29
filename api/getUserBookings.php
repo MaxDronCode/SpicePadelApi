@@ -19,7 +19,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $last_id = $arr_result['max_id'];
 
     // Corregir la consulta para usar la variable correctamente y evitar SQL Injection
-    $q = "SELECT start_hour, end_hour, field_id FROM booking WHERE member_id = ? AND id = ?";
+    $q = "SELECT start_hour, end_hour, field_id, date FROM booking WHERE member_id = ? AND id = ?";
     $stmt = $conn->prepare($q);
     if ($stmt) {
         $stmt->bind_param("si", $user_mail, $last_id);
