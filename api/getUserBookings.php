@@ -11,24 +11,36 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $user_mail = $data['user_mail'] ?? '';
 
     // Usar consultas preparadas para prevenir inyección SQL
-    $qMaxid = "SELECT MAX(id) as max_id FROM booking WHERE member_id='$user_mail'";
+    $qMaxid = "SELECT MAX(id) as max_id FROM booking WHERE member_id=?";
     $stmtMaxid = $conn->prepare($qMaxid);
-    $stmtMaxid->execute();
-    $resultMaxid = $stmtMaxid->get_result();
-    $arr_result = $resultMaxid->fetch_assoc();
-    $last_id = $arr_result['max_id'];
+    if ($stmtMaxid) {
+        $stmtMaxid->bind_param("s", $user_mail);
+        $stmtMaxid->execute();
+        $resultMaxid = $stmtMaxid->get_result();
+        if ($resultMaxid->num_rows > 0) {
+            $arr_result = $resultMaxid->fetch_assoc();
+            $last_id = $arr_result['max_id'];
 
-    // Corregir la consulta para usar la variable correctamente y evitar SQL Injection
-    $q = "SELECT start_hour, end_hour, field_id, date FROM booking WHERE member_id = ? AND id = ?";
-    $stmt = $conn->prepare($q);
-    if ($stmt) {
-        $stmt->bind_param("si", $user_mail, $last_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $response = $result->fetch_assoc();
-        echo json_encode($response);
+            $q = "SELECT start_hour, end_hour, field_id, date FROM booking WHERE member_id = ? AND id = ?";
+            $stmt = $conn->prepare($q);
+            if ($stmt) {
+                $stmt->bind_param("si", $user_mail, $last_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $response = $result->fetch_assoc();
+                } else {
+                    $response = ['field_id' => 'N/A', 'start_hour' => 'N/A', 'end_hour' => 'N/A'];
+                }
+                echo json_encode($response);
+            } else {
+                echo json_encode(['error' => 'Error en la preparación de la consulta']);
+            }
+        } else {
+            echo json_encode(['field_id' => 'N/A', 'start_hour' => 'N/A', 'end_hour' => 'N/A']);
+        }
     } else {
-        echo json_encode(['error' => 'Error en la preparación de la consulta']);
+        echo json_encode(['error' => 'Error al preparar la consulta de ID máximo']);
     }
 }
 ?>
