@@ -36,7 +36,7 @@ if ($start_hour_time <= $cutoff_time) {
 $q = "SELECT * FROM booking WHERE field_id = '$field_id' AND date = '$date' AND NOT ('$end_hour' <= start_hour OR '$start_hour' >= end_hour)";
 $result = mysqli_query($conn, $q);
 if (mysqli_num_rows($result) > 0) {
-    echo json_encode(['success' => false, 'message' => 'Error al realizar la reserva']);
+    echo json_encode(['success' => false, 'message' => 'Error al realizar la reserva. No se pueden solapar las reservas']);
 } else {
 
     // antes del insert hay que comprobar 
