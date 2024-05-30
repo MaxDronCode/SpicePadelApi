@@ -13,14 +13,6 @@ $class_id = $data->class_id;
 $field_id = $data->field_id;
 
 
-$q = "SELECT count(*) as students, students_num FROM class_book, classes WHERE class_id = '$class_id' and id='$class_id'";
-$result = mysqli_query($conn, $q);
-$row = mysqli_fetch_assoc($result);
-
-if ($row["students"] >= $row["students_num"]) {
-    echo json_encode(['success' => false, 'message' => 'Error al entrar en la clase. No pueden haver mas de '. $row["students_num"].' alumnos.']);
-} else {
-
     // antes del insert hay que comprobar 
     $sql = "INSERT INTO class_book (dni_m, class_id, field_id) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
@@ -33,5 +25,5 @@ if ($row["students"] >= $row["students_num"]) {
     }
 
     
-}
+
 $conn->close();
